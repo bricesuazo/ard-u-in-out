@@ -1,8 +1,8 @@
 export default {
   providers: [
     {
-      domain: "https://hip-lacewing-0.clerk.accounts.dev",
-      applicationID: "convex",
+      domain: process.env.CLERK_JWT_ISSUER_DOMAIN,
+      applicationID: 'convex',
     },
   ],
 };
