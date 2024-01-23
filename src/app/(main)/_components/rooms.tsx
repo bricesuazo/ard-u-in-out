@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { api } from '../../../../convex/_generated/api';
 
 export default function Rooms() {
-  const rooms = useQuery(api.rooms.getRooms);
+  const rooms = useQuery(api.rooms.getAllRooms);
   return (
     <div>
       <h1 className="font-bold text-2xl text-center">Rooms</h1>

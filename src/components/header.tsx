@@ -1,35 +1,33 @@
 'use client';
 
-import {
-  ClerkLoading,
-  SignInButton,
-  SignOutButton,
-  SignedIn,
-  SignedOut,
-} from '@clerk/nextjs';
+import { SignInButton, UserButton } from '@clerk/nextjs';
+import { useConvexAuth } from 'convex/react';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '~/components/ui/button';
 
 export default function Header() {
+  const { isLoading, isAuthenticated } = useConvexAuth();
+
   return (
     <header className="flex justify-between items-center">
-      <h3 className="font-bold">ARD U IN/Out</h3>
-      <div>
-        <SignedIn>
-          <Button asChild size="sm">
-            <SignOutButton>Log out</SignOutButton>
-          </Button>
-        </SignedIn>
-        <SignedOut>
+      <Link href="/">
+        <h3 className="font-bold">ARD U IN/Out</h3>
+      </Link>
+      <div className="h-9">
+        {isLoading ? (
+          <div className="p-2">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : !isAuthenticated ? (
           <Button asChild size="sm">
             <SignInButton mode="modal">Sign in</SignInButton>
           </Button>
-        </SignedOut>
-        <ClerkLoading>
-          <div className="px-6 py-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <div className="py-1">
+            <UserButton />
           </div>
-        </ClerkLoading>
+        )}
       </div>
     </header>
   );

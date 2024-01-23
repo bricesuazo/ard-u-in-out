@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@clerk/clerk-react':
+    specifier: ^4.30.3
+    version: 4.30.3(react@18.2.0)
   '@clerk/nextjs':
     specifier: ^4.29.4
     version: 4.29.4(next@14.1.0)(react-dom@18.2.0)(react@18.2.0)
@@ -106,7 +109,7 @@ dependencies:
     version: 0.2.0(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
   convex:
     specifier: ^1.8.0
-    version: 1.8.0(react-dom@18.2.0)(react@18.2.0)
+    version: 1.8.0(@clerk/clerk-react@4.30.3)(react-dom@18.2.0)(react@18.2.0)
   date-fns:
     specifier: ^3.3.1
     version: 3.3.1
@@ -3017,7 +3020,7 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==, tarball: https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz}
     dev: true
 
-  /convex@1.8.0(react-dom@18.2.0)(react@18.2.0):
+  /convex@1.8.0(@clerk/clerk-react@4.30.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-3Iis7NL46qGNZ8Ac5/kQ+aulmomUjbIOUGKOoGNF7JQtIrixmPsckt/4QK8YuOp5mLBdGghdSgGCF8C79jfS4Q==, tarball: https://registry.npmjs.org/convex/-/convex-1.8.0.tgz}
     engines: {node: '>=16.15.1', npm: '>=7.0.0'}
     hasBin: true
@@ -3036,6 +3039,7 @@ packages:
       react-dom:
         optional: true
     dependencies:
+      '@clerk/clerk-react': 4.30.3(react@18.2.0)
       esbuild: 0.17.19
       jwt-decode: 3.1.2
       node-fetch: 2.7.0
