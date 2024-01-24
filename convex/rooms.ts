@@ -21,6 +21,35 @@ export const getAllRooms = query({
     );
   },
 });
+export const getRoom = query({
+  args: { id: v.string() },
+  handler: async (ctx, args) => {
+    const room = await ctx.db
+      .query('rooms')
+      .filter((q) => q.eq(q.field('_id'), args.id))
+      .unique();
+
+    if (!room) throw new Error('Room not found');
+
+    const members = await ctx.db
+      .query('members')
+      .filter((q) => q.eq(q.field('room'), room._id))
+      .collect();
+
+    const events = await ctx.db
+      .query('events')
+      .filter((q) => q.eq(q.field('room'), room._id))
+      .collect();
+
+    return {
+      ...room,
+      members,
+      events: events.filter((event) =>
+        members.map((member) => member._id).includes(event.member),
+      ),
+    };
+  },
+});
 export const getMyRooms = query({
   handler: async (ctx) => {
     const user = await ctx.auth.getUserIdentity();

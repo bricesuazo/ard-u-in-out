@@ -15,5 +15,6 @@ export default defineSchema({
   events: defineTable({
     type: v.string(),
     member: v.id('members'),
+    room: v.id('rooms'),
   }).index('by_type', ['type']),
 });

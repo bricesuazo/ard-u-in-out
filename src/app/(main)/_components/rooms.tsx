@@ -17,9 +17,11 @@ export default function Rooms() {
         <p>No rooms found</p>
       ) : (
         rooms.map((room) => (
-          <Link href={`/${room._id}`} key={room._id}>
-            <h2>{room.name}</h2>
-            <p>{room.members.map((member) => member.name).join(', ')}</p>
+          <Link href={`/room/${room._id}`} key={room._id}>
+            <div className="border hover:bg-gray-100 p-4 rounded">
+              <h2 className="font-semibold">{room.name}</h2>
+              <p>{room.members.map((member) => member.name).join(', ')}</p>
+            </div>
           </Link>
         ))
       )}
