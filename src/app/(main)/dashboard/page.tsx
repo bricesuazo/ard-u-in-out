@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-// import { useQuery } from 'convex/react';
-// import Link from 'next/link';
+import { Authenticated, useQuery } from 'convex/react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '~/components/ui/button';
@@ -17,7 +17,7 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 
-// import { api } from '../../../../convex/_generated/api';
+import { api } from '../../../../convex/_generated/api';
 
 const FormSchema = z.object({
   name: z.string().min(1, {
@@ -31,7 +31,6 @@ const FormSchema = z.object({
 });
 
 export default function DashboardPage() {
-  // const rooms = useQuery(api.rooms.getMyRooms);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -85,7 +84,16 @@ export default function DashboardPage() {
         </form>
       </Form>
 
-      {/* {!rooms ? (
+      <Test />
+    </div>
+  );
+}
+
+function Test() {
+  const rooms = useQuery(api.rooms.getMyRooms);
+  return (
+    <Authenticated>
+      {!rooms ? (
         <p>Loading...</p>
       ) : rooms.length === 0 ? (
         <p>No rooms found</p>
@@ -96,7 +104,7 @@ export default function DashboardPage() {
             <p>{room.members.map((member) => member.name).join(', ')}</p>
           </Link>
         ))
-      )} */}
-    </div>
+      )}
+    </Authenticated>
   );
 }

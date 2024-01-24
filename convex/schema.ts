@@ -10,19 +10,8 @@ export default defineSchema({
   rooms: defineTable({
     name: v.string(),
     members: v.array(v.id('members')),
-    creator: v.id('users'),
+    creator: v.string(),
   }).index('by_name', ['name']),
-
-  users: defineTable({
-    name: v.string(),
-    email: v.string(),
-    imageUrl: v.optional(v.string()),
-    tokenIdentifier: v.string(),
-  })
-    .index('by_name', ['name'])
-    .index('by_email', ['email'])
-    .index('by_tokenIdentifier', ['tokenIdentifier']),
-
   events: defineTable({
     type: v.string(),
     member: v.id('members'),

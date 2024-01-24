@@ -1,14 +1,9 @@
 import { v } from 'convex/values';
 
-import { type QueryCtx, mutation, query } from './_generated/server';
+import { mutation, query } from './_generated/server';
 
 export const getAllRooms = query({
   handler: async (ctx) => {
-    // const identity = await ctx.auth.getUserIdentity();
-    // if (!identity) {
-    //   throw new Error('Not logged in');
-    // }
-
     const rooms = await ctx.db.query('rooms').collect();
 
     return Promise.all(
@@ -28,11 +23,13 @@ export const getAllRooms = query({
 });
 export const getMyRooms = query({
   handler: async (ctx) => {
-    const user = await getUser(ctx);
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) throw new Error('Not logged in');
 
     const rooms = await ctx.db
       .query('rooms')
-      .filter((q) => q.eq(q.field('creator'), user._id))
+      .filter((q) => q.eq(q.field('creator'), user.subject))
       .collect();
 
     return Promise.all(
@@ -54,12 +51,14 @@ export const getMyRooms = query({
 export const createRoom = mutation({
   args: { name: v.string(), members_name: v.array(v.string()) },
   handler: async (ctx, args) => {
-    const user = await getUser(ctx);
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) throw new Error('Not logged in');
 
     const room = await ctx.db.insert('rooms', {
       name: args.name,
       members: [],
-      creator: user._id,
+      creator: user.subject,
     });
 
     const members = await Promise.all(
@@ -76,23 +75,3 @@ export const createRoom = mutation({
     await ctx.db.patch(room, { members });
   },
 });
-
-export async function getUser(ctx: QueryCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Not logged in');
-  }
-
-  const user = await ctx.db
-    .query('users')
-    .withIndex('by_tokenIdentifier', (q) =>
-      q.eq('tokenIdentifier', identity.tokenIdentifier),
-    )
-    .unique();
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  return user;
-}
