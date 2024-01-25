@@ -3,6 +3,7 @@
 import { type Doc, type Id } from 'convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { useState } from 'react';
 import { AlertDialogHeader } from '~/components/ui/alert-dialog';
 import { Button } from '~/components/ui/button';
 import {
@@ -61,11 +62,14 @@ function Member({
   member: Doc<'members'>;
   roomId: Id<'rooms'>;
 }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const changeStatusMutation = useMutation(api.rooms.changeStatus);
+
   return (
     <div className="grid grid-cols-6 gap-2">
       <div>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="xs">Change</Button>
           </DialogTrigger>
@@ -76,26 +80,36 @@ function Member({
 
             <div className="flex">
               <Button
-                onClick={() =>
-                  changeStatusMutation({
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  await changeStatusMutation({
                     roomId,
                     type: 'IN',
                     memberId: member._id,
-                  })
-                }
+                  });
+
+                  setLoading(false);
+                  setOpen(false);
+                }}
                 variant="ghost"
                 className="h-40 text-xl flex-1"
               >
                 In
               </Button>
               <Button
-                onClick={() =>
-                  changeStatusMutation({
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  await changeStatusMutation({
                     roomId,
                     type: 'OUT',
                     memberId: member._id,
-                  })
-                }
+                  });
+
+                  setLoading(false);
+                  setOpen(false);
+                }}
                 variant="ghost"
                 className="h-40 text-xl flex-1"
               >

@@ -54,7 +54,7 @@ export const getMyRooms = query({
   handler: async (ctx) => {
     const user = await ctx.auth.getUserIdentity();
 
-    if (!user) throw new Error('Not logged in');
+    if (!user) return;
 
     const rooms = await ctx.db
       .query('rooms')
@@ -104,6 +104,7 @@ export const createRoom = mutation({
     await ctx.db.patch(room, { members });
   },
 });
+
 export const changeStatus = mutation({
   args: { type: v.string(), roomId: v.id('rooms'), memberId: v.id('members') },
   handler: async (ctx, args) => {
