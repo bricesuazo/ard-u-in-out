@@ -59,7 +59,7 @@ function Member({
   member,
   roomId,
 }: {
-  member: Doc<'members'>;
+  member: Doc<'members'> & { eventType: string };
   roomId: Id<'rooms'>;
 }) {
   const [open, setOpen] = useState(false);
@@ -80,7 +80,7 @@ function Member({
 
             <div className="flex">
               <Button
-                disabled={loading}
+                disabled={loading || member.eventType === 'IN'}
                 onClick={async () => {
                   setLoading(true);
                   await changeStatusMutation({
@@ -98,7 +98,7 @@ function Member({
                 In
               </Button>
               <Button
-                disabled={loading}
+                disabled={loading || member.eventType === 'OUT'}
                 onClick={async () => {
                   setLoading(true);
                   await changeStatusMutation({
@@ -121,10 +121,18 @@ function Member({
       </div>
       <div className="col-span-3">{member.name}</div>
       <div className="place-self-center">
-        <XCircle className="text-red-500" />
+        {member.eventType === 'IN' ? (
+          <CheckCircle2 className="text-green-500" />
+        ) : (
+          <XCircle className="text-red-500" />
+        )}
       </div>
       <div className="place-self-center">
-        <CheckCircle2 className="text-green-500" />
+        {member.eventType === 'OUT' ? (
+          <CheckCircle2 className="text-green-500" />
+        ) : (
+          <XCircle className="text-red-500" />
+        )}
       </div>
     </div>
   );

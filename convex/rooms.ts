@@ -31,22 +31,26 @@ export const getRoom = query({
 
     if (!room) throw new Error('Room not found');
 
-    const members = await ctx.db
+    const membersWithoutEvent = await ctx.db
       .query('members')
       .filter((q) => q.eq(q.field('room'), room._id))
       .collect();
 
-    const events = await ctx.db
-      .query('events')
-      .filter((q) => q.eq(q.field('room'), room._id))
-      .collect();
+    const members = await Promise.all(
+      membersWithoutEvent.map(async (member) => {
+        const event = await ctx.db
+          .query('events')
+          .filter((q) => q.eq(q.field('member'), member._id))
+          .order('desc')
+          .first();
+
+        return { ...member, eventType: event ? event.type : 'OUT' };
+      }),
+    );
 
     return {
       ...room,
       members,
-      events: events.filter((event) =>
-        members.map((member) => member._id).includes(event.member),
-      ),
     };
   },
 });
