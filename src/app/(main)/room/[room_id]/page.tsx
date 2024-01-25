@@ -1,7 +1,16 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { Loader2 } from 'lucide-react';
+import { type Doc, type Id } from 'convex/_generated/dataModel';
+import { useMutation, useQuery } from 'convex/react';
+import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { AlertDialogHeader } from '~/components/ui/alert-dialog';
+import { Button } from '~/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '~/components/ui/dialog';
 
 import { api } from '../../../../../convex/_generated/api';
 
@@ -13,7 +22,7 @@ export default function RoomPage({
   const room = useQuery(api.rooms.getRoom, { id: room_id });
 
   return (
-    <div className="h-full my-8">
+    <div className="">
       {room === undefined ? (
         <div className="grid place-items-center h-full">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -25,18 +34,84 @@ export default function RoomPage({
           <h1 className="text-center font-bold text-xl">{room.name}</h1>
 
           <h4 className="font-medium text-lg text-center">Members</h4>
-          <div>
-            {room.members.map((member) => (
-              <div key={member._id} className="flex">
-                <div>{member.name}</div>
-                {/* <div>
-                  {room.events.filter((event) => event._id === member._id)}
-                </div> */}
-              </div>
-            ))}
+          <p className="text-center text-sm">{new Date().toDateString()}</p>
+          <div className="space-y-2">
+            <div className="grid grid-cols-6 mt-10 space-y-4 gap-2">
+              <div />
+              <div className="col-span-3" />
+              <p className="place-self-center">In</p>
+              <p className="place-self-center">Out</p>
+            </div>
+            <div className="space-y-4">
+              {room.members.map((member) => (
+                <Member key={member._id} member={member} roomId={room._id} />
+              ))}
+            </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Member({
+  member,
+  roomId,
+}: {
+  member: Doc<'members'>;
+  roomId: Id<'rooms'>;
+}) {
+  const changeStatusMutation = useMutation(api.rooms.changeStatus);
+  return (
+    <div className="grid grid-cols-6 gap-2">
+      <div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button size="xs">Change</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <AlertDialogHeader>
+              <DialogTitle>Change status for {member.name}</DialogTitle>
+            </AlertDialogHeader>
+
+            <div className="flex">
+              <Button
+                onClick={() =>
+                  changeStatusMutation({
+                    roomId,
+                    type: 'IN',
+                    memberId: member._id,
+                  })
+                }
+                variant="ghost"
+                className="h-40 text-xl flex-1"
+              >
+                In
+              </Button>
+              <Button
+                onClick={() =>
+                  changeStatusMutation({
+                    roomId,
+                    type: 'OUT',
+                    memberId: member._id,
+                  })
+                }
+                variant="ghost"
+                className="h-40 text-xl flex-1"
+              >
+                Out
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="col-span-3">{member.name}</div>
+      <div className="place-self-center">
+        <XCircle className="text-red-500" />
+      </div>
+      <div className="place-self-center">
+        <CheckCircle2 className="text-green-500" />
+      </div>
     </div>
   );
 }

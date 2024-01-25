@@ -104,3 +104,17 @@ export const createRoom = mutation({
     await ctx.db.patch(room, { members });
   },
 });
+export const changeStatus = mutation({
+  args: { type: v.string(), roomId: v.id('rooms'), memberId: v.id('members') },
+  handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) throw new Error('Not logged in');
+
+    await ctx.db.insert('events', {
+      room: args.roomId,
+      type: args.type,
+      member: args.memberId,
+    });
+  },
+});

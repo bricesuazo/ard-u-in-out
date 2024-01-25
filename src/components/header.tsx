@@ -24,7 +24,10 @@ export default function Header() {
             <SignInButton mode="modal">Sign in</SignInButton>
           </Button>
         ) : (
-          <div className="py-1">
+          <div className="flex items-center gap-x-2">
+            <Button asChild size="sm">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
             <UserButton />
           </div>
         )}

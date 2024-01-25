@@ -143,13 +143,11 @@ function Rooms() {
     <p>No rooms found</p>
   ) : (
     rooms.map((room) => (
-      <Link
-        href={`/room/${room._id}`}
-        key={room._id}
-        className="rounded border hover:bg-gray-500"
-      >
-        <h2 className="font-semibold text-xl">{room.name}</h2>
-        <p>{room.members.map((member) => member.name).join(', ')}</p>
+      <Link href={`/room/${room._id}`} key={room._id}>
+        <div className="p-4 rounded border hover:bg-gray-100">
+          <h2 className="font-semibold text-xl">{room.name}</h2>
+          <p>{room.members.map((member) => member.name).join(', ')}</p>
+        </div>
       </Link>
     ))
   );
