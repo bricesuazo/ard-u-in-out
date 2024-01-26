@@ -1,11 +1,12 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { api } from '../../../convex/_generated/api';
 
 export default function Home() {
+  const router = useRouter();
   const rooms = useQuery(api.rooms.getAllRooms);
   return (
     <div>
@@ -18,15 +19,16 @@ export default function Home() {
       ) : (
         <div className="flex flex-col gap-y-1">
           {rooms.map((room) => (
-            <Link href={`/room/${room._id}`} key={room._id}>
-              <div className="border hover:bg-muted p-4 rounded">
-                <h2 className="font-semibold">{room.name}</h2>
-                <p className="text-sm line-clamp-1">
-                  Members:{' '}
-                  {room.members.map((member) => member.name).join(', ')}
-                </p>
-              </div>
-            </Link>
+            <button
+              key={room._id}
+              className="text-left border hover:bg-muted p-4 rounded"
+              onClick={() => router.push(`/room/${room._id}`)}
+            >
+              <h2 className="font-semibold">{room.name}</h2>
+              <p className="text-sm line-clamp-1">
+                Members: {room.members.map((member) => member.name).join(', ')}
+              </p>
+            </button>
           ))}
         </div>
       )}

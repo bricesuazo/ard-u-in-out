@@ -91,10 +91,6 @@ export const getMyRooms = query({
 export const memberHistory = query({
   args: { memberId: v.id('members') },
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-
-    if (!user) return;
-
     const events = await ctx.db
       .query('events')
       .filter((q) => q.eq(q.field('member'), args.memberId))
@@ -136,10 +132,6 @@ export const createRoom = mutation({
 export const changeStatus = mutation({
   args: { type: v.string(), roomId: v.id('rooms'), memberId: v.id('members') },
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-
-    if (!user) throw new Error('Not logged in');
-
     const createdEvent = await ctx.db.insert('events', {
       room: args.roomId,
       type: args.type,
