@@ -1,4 +1,5 @@
 import { v } from 'convex/values';
+import dayjs from 'dayjs';
 
 import { mutation, query } from './_generated/server';
 
@@ -41,10 +42,17 @@ export const getRoom = query({
         const event = await ctx.db
           .query('events')
           .filter((q) => q.eq(q.field('member'), member._id))
+          .filter((q) => q.eq(q.field('room'), room._id))
           .order('desc')
           .first();
 
-        return { ...member, eventType: event ? event.type : 'OUT' };
+        return {
+          ...member,
+          eventType:
+            event && dayjs().isSame(dayjs(event._creationTime), 'D')
+              ? event.type
+              : 'OUT',
+        };
       }),
     );
 

@@ -19,7 +19,7 @@ export default function Home() {
         <div className="flex flex-col gap-y-1">
           {rooms.map((room) => (
             <Link href={`/room/${room._id}`} key={room._id}>
-              <div className="border hover:bg-gray-100 p-4 rounded">
+              <div className="border hover:bg-muted p-4 rounded">
                 <h2 className="font-semibold">{room.name}</h2>
                 <p className="text-sm line-clamp-1">
                   Members:{' '}

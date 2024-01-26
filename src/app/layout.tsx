@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { ClientProviders } from '~/app/providers';
+import { Toaster } from '~/components/ui/sonner';
 import '~/styles/globals.css';
 
 const font = Poppins({
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <ClientProviders>{children}</ClientProviders>
+        <ClientProviders>
+          {children}
+          <Toaster />
+        </ClientProviders>
       </body>
     </html>
   );
