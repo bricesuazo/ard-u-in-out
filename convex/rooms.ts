@@ -88,6 +88,22 @@ export const getMyRooms = query({
     );
   },
 });
+export const memberHistory = query({
+  args: { memberId: v.id('members') },
+  handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) return;
+
+    const events = await ctx.db
+      .query('events')
+      .filter((q) => q.eq(q.field('member'), args.memberId))
+      .order('desc')
+      .collect();
+
+    return events;
+  },
+});
 
 export const createRoom = mutation({
   args: { name: v.string(), members_name: v.array(v.string()) },
@@ -124,10 +140,20 @@ export const changeStatus = mutation({
 
     if (!user) throw new Error('Not logged in');
 
-    await ctx.db.insert('events', {
+    const createdEvent = await ctx.db.insert('events', {
       room: args.roomId,
       type: args.type,
       member: args.memberId,
     });
+
+    const event = await ctx.db.get(createdEvent);
+
+    if (!event) throw new Error('Event not found');
+
+    const member = await ctx.db.get(args.memberId);
+
+    if (!member) throw new Error('Member not found');
+
+    return member;
   },
 });
