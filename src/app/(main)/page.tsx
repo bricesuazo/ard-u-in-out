@@ -2,6 +2,7 @@
 
 import { useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
+import { Skeleton } from '~/components/ui/skeleton';
 
 import { api } from '../../../convex/_generated/api';
 
@@ -10,12 +11,16 @@ export default function Home() {
   const rooms = useQuery(api.rooms.getAllRooms);
   return (
     <div>
-      <h1 className="font-bold text-2xl text-center">Rooms</h1>
+      <h1 className="font-bold text-2xl text-center my-4">Rooms</h1>
 
       {!rooms ? (
-        <p>Loading...</p>
+        <div className="space-y-1">
+          <Skeleton className="h-20 rounded" />
+          <Skeleton className="h-20 rounded" />
+          <Skeleton className="h-20 rounded" />
+        </div>
       ) : rooms.length === 0 ? (
-        <p>No rooms found</p>
+        <p className="text-center">No rooms found</p>
       ) : (
         <div className="flex flex-col gap-y-1">
           {rooms.map((room) => (
