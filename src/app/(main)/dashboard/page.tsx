@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
-import { Minus, Plus } from 'lucide-react';
+import { Loader2, Minus, Plus, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -246,6 +246,8 @@ function RoomForm({ setOpen }: { setOpen: (open: boolean) => void }) {
 }
 
 function Rooms() {
+  const [isPending, startTransition] = useTransition();
+  const deleteRoomMutation = useMutation(api.rooms.deleteRoom);
   const router = useRouter();
   const rooms = useQuery(api.rooms.getMyRooms);
 
@@ -263,12 +265,37 @@ function Rooms() {
         <button
           key={room._id}
           onClick={() => router.push(`/room/${room._id}`)}
-          className="p-4 rounded border hover:bg-muted w-full text-left"
+          className="p-4 rounded border hover:bg-muted w-full text-left group relative"
         >
           <h2 className="font-semibold">{room.name}</h2>
           <p className="text-sm">
             {room.members.map((member) => member.name).join(', ')}
           </p>
+
+          <Button
+            size="icon"
+            variant="destructive"
+            className="transition absolute top-1/2 -translate-y-1/2 right-4 opacity-0 group-hover:opacity-100"
+            disabled={isPending}
+            onClick={(e) => {
+              e.stopPropagation();
+              startTransition(async () => {
+                const promise = deleteRoomMutation({ id: room._id });
+
+                toast.promise(promise, {
+                  loading: 'Deleting room...',
+                  success: 'Room deleted.',
+                  error: 'Failed to delete room',
+                });
+              });
+            }}
+          >
+            {isPending ? (
+              <Loader2 size="1rem" className="animate-spin" />
+            ) : (
+              <Trash size="1rem" />
+            )}
+          </Button>
         </button>
       ))}
     </div>

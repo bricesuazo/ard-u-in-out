@@ -128,6 +128,40 @@ export const createRoom = mutation({
     await ctx.db.patch(room, { members });
   },
 });
+export const deleteRoom = mutation({
+  args: { id: v.id('rooms') },
+  handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity();
+
+    if (!user) throw new Error('Not logged in');
+
+    const room = await ctx.db.get(args.id);
+
+    if (!room) throw new Error('Room not found');
+
+    if (room.creator !== user.subject) throw new Error('Not authorized');
+
+    const members = await ctx.db
+      .query('members')
+      .filter((q) => q.eq(q.field('room'), room._id))
+      .collect();
+
+    const events = await ctx.db
+      .query('events')
+      .filter((q) => q.eq(q.field('room'), room._id))
+      .collect();
+
+    await Promise.all([
+      ...members.map(async (member) => {
+        await ctx.db.delete(member._id);
+      }),
+      ...events.map(async (event) => {
+        await ctx.db.delete(event._id);
+      }),
+      await ctx.db.delete(args.id),
+    ]);
+  },
+});
 
 export const changeStatus = mutation({
   args: { type: v.string(), roomId: v.id('rooms'), memberId: v.id('members') },
