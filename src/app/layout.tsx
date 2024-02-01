@@ -10,8 +10,8 @@ const font = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'ARN U IN/Out',
-  description: 'ARN U IN/Out',
+  title: 'ARD U IN/Out',
+  description: 'ARD U IN/Out',
 };
 
 export default function RootLayout({
