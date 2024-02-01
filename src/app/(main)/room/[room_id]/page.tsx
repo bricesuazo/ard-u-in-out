@@ -251,7 +251,7 @@ function StatusChange({
   const [loading, setLoading] = useState(false);
   const changeStatusMutation = useMutation(api.rooms.changeStatus);
 
-  function onChangeStatus(status: 'IN' | 'OUT') {
+  function onChangeStatus(status: 'IN' | 'OUT' | 'IN MEETING') {
     setLoading(true);
 
     const promise = changeStatusMutation({
@@ -275,22 +275,32 @@ function StatusChange({
         {dayjs(today).format('h:mm:ss A')}
       </h2>
 
-      <div className="flex">
+      <div>
+        <div className="flex">
+          <Button
+            disabled={loading || member.eventType === 'IN'}
+            onClick={() => onChangeStatus('IN')}
+            variant="ghost"
+            className="h-40 text-xl flex-1"
+          >
+            In
+          </Button>
+          <Button
+            disabled={loading || member.eventType === 'OUT'}
+            onClick={() => onChangeStatus('OUT')}
+            variant="ghost"
+            className="h-40 text-xl flex-1"
+          >
+            Out
+          </Button>
+        </div>
         <Button
-          disabled={loading || member.eventType === 'IN'}
-          onClick={() => onChangeStatus('IN')}
+          disabled={loading || member.eventType === 'IN MEETING'}
+          onClick={() => onChangeStatus('IN MEETING')}
           variant="ghost"
-          className="h-40 text-xl flex-1"
+          className="h-20 text-xl flex-1 w-full"
         >
-          In
-        </Button>
-        <Button
-          disabled={loading || member.eventType === 'OUT'}
-          onClick={() => onChangeStatus('OUT')}
-          variant="ghost"
-          className="h-40 text-xl flex-1"
-        >
-          Out
+          In Meeting
         </Button>
       </div>
     </>
