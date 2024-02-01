@@ -164,13 +164,22 @@ export const deleteRoom = mutation({
 });
 
 export const changeStatus = mutation({
-  args: { type: v.string(), roomId: v.id('rooms'), memberId: v.id('members') },
+  args: {
+    type: v.string(),
+    roomId: v.id('rooms'),
+    memberId: v.id('members'),
+    realtimeEventId: v.optional(v.id('realtime_events')),
+  },
   handler: async (ctx, args) => {
     const createdEvent = await ctx.db.insert('events', {
       room: args.roomId,
       type: args.type,
       member: args.memberId,
     });
+
+    if (args.realtimeEventId) {
+      await ctx.db.patch(args.realtimeEventId, { type: 'CLOSE' });
+    }
 
     const event = await ctx.db.get(createdEvent);
 
@@ -181,5 +190,44 @@ export const changeStatus = mutation({
     if (!member) throw new Error('Member not found');
 
     return member;
+  },
+});
+
+export const addRealtimeEvent = mutation({
+  args: { roomId: v.id('rooms'), memberId: v.id('members') },
+  handler: async (ctx, args) => {
+    await ctx.db.insert('realtime_events', {
+      room: args.roomId,
+      type: 'OPEN',
+      member: args.memberId,
+    });
+  },
+});
+
+export const getRealtimeEvent = query({
+  args: { memberId: v.id('members'), roomId: v.id('rooms') },
+  handler: async (ctx, args) => {
+    const events = await ctx.db
+      .query('realtime_events')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('member'), args.memberId),
+          q.eq(q.field('room'), args.roomId),
+          q.eq(q.field('type'), 'OPEN'),
+        ),
+      )
+      .order('desc')
+      .first();
+
+    return events;
+  },
+});
+
+export const closeRealtimeEvent = mutation({
+  args: {
+    realtimeEventsId: v.id('realtime_events'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.realtimeEventsId, { type: 'CLOSE' });
   },
 });

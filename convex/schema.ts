@@ -6,13 +6,17 @@ export default defineSchema({
     name: v.string(),
     room: v.id('rooms'),
   }).index('by_name', ['name']),
-
   rooms: defineTable({
     name: v.string(),
     members: v.array(v.id('members')),
     creator: v.string(),
   }).index('by_name', ['name']),
   events: defineTable({
+    type: v.string(),
+    member: v.id('members'),
+    room: v.id('rooms'),
+  }).index('by_type', ['type']),
+  realtime_events: defineTable({
     type: v.string(),
     member: v.id('members'),
     room: v.id('rooms'),
