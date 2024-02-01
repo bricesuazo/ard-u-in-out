@@ -4,7 +4,8 @@ import { type Doc, type Id } from 'convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Fingerprint, Loader2 } from 'lucide-react';
+import { Check, Loader2, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useMediaQuery } from 'usehooks-ts';
@@ -27,6 +28,16 @@ import {
 } from '~/components/ui/drawer';
 import { ScrollArea } from '~/components/ui/scroll-area';
 import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '~/components/ui/sheet';
+import {
   Table,
   TableBody,
   TableCell,
@@ -42,11 +53,14 @@ dayjs.extend(relativeTime);
 export function RoomPageClient({
   room_id,
   userId,
+  APP_URL,
 }: {
   room_id: string;
   userId: string | null;
+  APP_URL: string;
 }) {
   const [today, setToday] = useState(new Date());
+  const [copied, setCopied] = useState(false);
 
   const room = useQuery(api.rooms.getRoom, { id: room_id });
 
@@ -58,7 +72,56 @@ export function RoomPageClient({
   }, []);
 
   return (
-    <div className="">
+    <>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button className="fixed bottom-4 right-4 h-14 w-h-14 aspect-square rounded-full">
+            <QrCode />
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>QR Code for {room?.name}</SheetTitle>
+            <SheetDescription>
+              Share this QR code to allow people to check in/out.
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="space-y-4 py-4">
+            <QRCodeSVG
+              value={`${APP_URL}/room/${room_id}`}
+              className="w-full h-full aspect-square p-4"
+            />
+            <div className="flex">
+              <input
+                value={`${APP_URL}/room/${room_id}`}
+                className="text-sm h-10 p-2 border flex-1 rounded-l-md truncate outline-none"
+                readOnly
+              />
+              <Button
+                className="w-16 rounded-l-none"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(
+                    `${APP_URL}/room/${room_id}`,
+                  );
+                  setCopied(true);
+                  setTimeout(() => {
+                    setCopied(false);
+                  }, 2000);
+                }}
+              >
+                {copied ? <Check /> : 'Copy'}
+              </Button>
+            </div>
+          </div>
+
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button variant="ghost">Close</Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
       {room === undefined ? (
         <div className="grid place-items-center p-8">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -98,8 +161,7 @@ export function RoomPageClient({
               </TableBody>
             </Table>
           </div>
-
-          <div
+          {/* <div
             className="aspect-square grid place-items-center p-10"
             style={{
               borderRadius: 20,
@@ -115,10 +177,10 @@ export function RoomPageClient({
                 for {room.name}
               </h2>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
